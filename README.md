@@ -17,7 +17,7 @@
 ## 技术实现
 
 1. ffmpeg 下载可以执行安装包
-2. 使用 node.js child_process 执行执行 ffmpeg 命令
+2. 使用 node.js child_process 执行 ffmpeg 命令
 3. 此时，传入文件路径，和输出目录 ffmpeg 把视频直接转换成 gif 图片
 4. 使用 electron 打包可执行的安装包
 
