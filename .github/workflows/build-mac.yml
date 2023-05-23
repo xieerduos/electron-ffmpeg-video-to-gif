@@ -18,6 +18,11 @@ jobs:
         with:
           python-version: 2.x
 
+      - name: Get Python Path
+        run: |
+          echo "PYTHON_PATH=$(which python2)" >> $GITHUB_ENV
+          echo "Python Path: $PYTHON_PATH"
+
       - name: Install Node.js
         uses: actions/setup-node@v2
         with:
