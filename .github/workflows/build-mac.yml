@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs_on: macos-latest
+    runs-on: macos-latest
 
     steps:
       - name: Checkout code
