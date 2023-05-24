@@ -6,14 +6,9 @@ on:
       - main
     tags:
       - '*'
-
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [macos-latest, windows-latest]
+    runs-on: macos-latest
 
     steps:
       - name: Checkout code
@@ -43,6 +38,6 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          files: ${{ matrix.os == 'windows-latest' && 'dist_electron/*.exe, dist_electron/*.msi' || 'dist_electron/*.dmg' }}
+          files: dist_electron/*.dmg
         env:
           GITHUB_TOKEN: ${{ secrets.TO_GIF_TOKEN }}
