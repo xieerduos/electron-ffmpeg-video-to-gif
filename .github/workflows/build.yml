@@ -1,0 +1,48 @@
+name: Build and Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - '*'
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python 2.x
+        uses: actions/setup-python@v2
+        with:
+          python-version: 2.x
+
+      - name: Get Python Path
+        run: |
+          echo "PYTHON_PATH=$(which python2)" >> $GITHUB_ENV
+          echo "Python Path: $PYTHON_PATH"
+
+      - name: Install Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run electron:build
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ matrix.os == 'windows-latest' && 'dist_electron/*.exe, dist_electron/*.msi' || 'dist_electron/*.dmg' }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.TO_GIF_TOKEN }}

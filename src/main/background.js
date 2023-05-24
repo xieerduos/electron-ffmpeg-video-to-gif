@@ -4,6 +4,7 @@ import {app, protocol, BrowserWindow} from 'electron';
 import {createProtocol} from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, {VUEJS3_DEVTOOLS} from 'electron-devtools-installer';
 import path from 'path';
+import fs from 'fs';
 const log = require('@/main/log/index.js');
 log.info(`Node.js 版本: ${process.versions.node}`);
 log.info('process.cwd()', process.cwd());
@@ -95,14 +96,25 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-  const copyResourceToAppData = require('@/main/utils/copyResourceToAppData.js');
+  const copyResourceToAppData = require('@/main/ffmpeg/copyResourceToAppData.js');
+  const filePath = process.platform === 'win32' ? 'ffmpeg/win/win.zip' : 'ffmpeg/mac/ffmpeg.zip';
 
-  copyResourceToAppData('ffmpeg/mac/ffmpeg.zip')
+  const getFFmpegPath = require('@/main/ffmpeg/getFFmpegPath.js');
+  const checkFileAccess = require('@/main/ffmpeg/checkFileAccess.js');
+  const ffmpegPath = getFFmpegPath();
+  checkFileAccess(ffmpegPath, fs.constants.F_OK)
     .then(() => {
-      log.info('Resource copied successfully');
+      log.info('ffmpeg可执行文件存在。');
     })
-    .catch((error) => {
-      log.error('error', error);
+    .catch((err) => {
+      log.error('ffmpeg可执行文件不存在！', err);
+      copyResourceToAppData(filePath)
+        .then(() => {
+          log.info('Resource copied successfully', filePath);
+        })
+        .catch((error) => {
+          log.error('error', error);
+        });
     });
 
   if (isDevelopment && !process.env.IS_TEST) {

@@ -1,16 +1,8 @@
-// const sudo = require('sudo-prompt');
-// const options = {
-//   name: 'Electron',
-//   icns: '/Users/shaohai.li/project/electron-ffmpeg/public/icons/mac/icon.icns' // (optional)
-// };
-// sudo.exec('echo hello', options, function (error, stdout, stderr) {
-//   if (error) throw error;
-//   console.log('stdout: ' + stdout);
-// });
-
 const {spawn} = require('child_process');
 const getFFmpegPath = require('./getFFmpegPath.js');
-
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
 const log = require('@/main/log/index.js');
 function convertWithFFmpeg(inputPath, outputPath, frameRate = 30, onCurrentProgress) {
   const ffmpegPath = getFFmpegPath(); // 更新为你的ffmpeg路径
@@ -27,6 +19,9 @@ function convertWithFFmpeg(inputPath, outputPath, frameRate = 30, onCurrentProgr
         let paletteProgress = 0;
         let convertProgress = 0;
 
+        // 生成的调色板文件路径
+        const palettePath = path.join(os.tmpdir(), 'palette.png');
+
         const ffmpeg = spawn(
           ffmpegPath,
           [
@@ -37,7 +32,7 @@ function convertWithFFmpeg(inputPath, outputPath, frameRate = 30, onCurrentProgr
             '-filter_complex',
             'scale=iw:-1:flags=lanczos,fps=30,palettegen=stats_mode=diff',
             '-y',
-            '/tmp/palette.png'
+            palettePath
           ],
           {signal}
         );
@@ -84,7 +79,7 @@ function convertWithFFmpeg(inputPath, outputPath, frameRate = 30, onCurrentProgr
                 '-i',
                 inputPath,
                 '-i',
-                '/tmp/palette.png',
+                palettePath,
                 '-r',
                 frameRate.toString(),
                 '-filter_complex',

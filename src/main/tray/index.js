@@ -6,12 +6,13 @@ exports.initialize = function initialize(windowManager) {
   tray = useTray(windowManager);
 };
 
+const isWindows = process.platform === 'win32';
 function useTray(windowManager) {
-  const iconPath = process.platform === 'win32' ? 'win/icon.ico' : 'png/icon.png';
+  const iconPath = isWindows ? 'win/icon.ico' : 'png/icon.png';
 
   console.log('iconPath', path.join(__static, 'icons', iconPath));
 
-  const tray = new Tray(path.join(__static, 'icons', iconPath), 'togif');
+  const tray = new Tray(path.join(__static, 'icons', iconPath));
 
   // const tray = new Tray(
   //   path.join(__static, `icons/${process.platform === 'win32' ? 'win/icon.ico' : 'png/32x32.png'}`)
@@ -47,7 +48,7 @@ function useTray(windowManager) {
   ];
 
   const contextMenu = Menu.buildFromTemplate(template);
-  tray.setToolTip('This is my application.');
+  tray.setToolTip('视频转gif图片');
   tray.setContextMenu(contextMenu);
 
   const clickCallBack = () => {
