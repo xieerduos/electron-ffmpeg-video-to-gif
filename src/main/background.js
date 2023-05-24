@@ -3,8 +3,8 @@
 import {app, protocol, BrowserWindow} from 'electron';
 import {createProtocol} from 'vue-cli-plugin-electron-builder/lib';
 import installExtension, {VUEJS3_DEVTOOLS} from 'electron-devtools-installer';
-import path from 'path';
-import fs from 'fs';
+const path = require('path');
+const fs = require('fs');
 const log = require('@/main/log/index.js');
 log.info(`Node.js 版本: ${process.versions.node}`);
 log.info('process.cwd()', process.cwd());
