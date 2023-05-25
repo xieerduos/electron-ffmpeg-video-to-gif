@@ -28,9 +28,8 @@ module.exports = defineConfig({
         // afterSign: './avr_scripts/after-sign.js',
         appId: 'com.electronffmpegvideotogif.www',
         icon:
-          process.platform === 'win32'
-            // eslint-disable-next-line operator-linebreak
-            ? path.join(__dirname, 'public/icons/win/icon.ico')
+          process.platform === 'win32' ? // eslint-disable-next-line operator-linebreak
+            path.join(__dirname, 'public/icons/win/icon.ico')
             : path.join(__dirname, 'public/icons/mac/icon.icns'),
         productName: name,
         // eslint-disable-next-line no-template-curly-in-string
@@ -39,11 +38,24 @@ module.exports = defineConfig({
         directories: {
           // output: "./dist_electron/${platform}/${arch}/"
         },
-        extraResources: [],
+        extraResources: [
+          process.platform === 'win32' ?
+            {
+              from: './ffmpeg/win',
+              to: 'ffmpeg/win'
+            }
+            : '',
+          process.platform === 'darwin' ?
+            {
+              from: './ffmpeg/mac',
+              to: 'ffmpeg/mac'
+            }
+            : ''
+        ].filter(Boolean),
         win: {
           icon: path.join(__dirname, 'public/icons/win/icon.ico'),
           // target：指定要打包的目标格式，这里使用了 msi 和 nsis 两个选项，分别代表 MSI 和 NSIS 格式的安装包。
-          target: ['msi', 'nsis'],
+          target: ['msi', 'nsis', 'zip'], // Added 'portable' and 'zip'
           // verifyUpdateCodeSignature 布尔值，表示是否验证更新包的数字签名。
           // 在发布应用程序更新时，为了确保更新包的完整性和安全性，通常需要对更新包进行数字签名。
           // 这个选项可以控制是否在安装更新时验证数字签名。
@@ -80,8 +92,12 @@ module.exports = defineConfig({
         // asar 是 Electron 用来打包应用程序的一种文件格式，这个选项可以用于指定应用程序中需要解压缩的文件或目录。
         // 这里使用了一个数组，其中包含两个字符串。第一个字符串指定了需要解压缩的所有 .node 文件，第二个字符串指定了需要解压缩的两个目录 sdk 和 public。
         // 'icons/mac/icon.icns',
-        asarUnpack: ['ffmpeg/mac', 'ffmpeg/win'],
+        // asarUnpack: [
+        //   process.platform === 'darwin' ? 'ffmpeg/mac' : '',
+        //   process.platform === 'win32' ? 'ffmpeg/win' : ''
+        // ].filter(Boolean),
         mac: {
+          target: ['dmg', 'zip'], // Added 'zip'
           category: name, // 指定应用程序所属的分类，通常用于在 macOS Dock 中显示应用程序的图标。
           hardenedRuntime: true, // 布尔值，表示是否启用强化的 macOS 运行时保护机制。
           extendInfo: {

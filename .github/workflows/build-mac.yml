@@ -38,5 +38,6 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           files: dist_electron/*.dmg
+          files: dist_electron/*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.TO_GIF_TOKEN }}

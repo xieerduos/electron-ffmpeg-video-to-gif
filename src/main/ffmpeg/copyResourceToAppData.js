@@ -12,8 +12,7 @@ const isWindows = platform() === 'win32';
 function copyResourceToAppData(resourceName) {
   return new Promise((resolve, reject) => {
     // 获取应用的资源目录
-    const resourcesPath =
-      process.env.NODE_ENV === 'production' ? path.join(process.resourcesPath, 'app.asar.unpacked') : __static;
+    const resourcesPath = process.env.NODE_ENV === 'production' ? process.resourcesPath : path.join(__static, '..');
 
     // 获取用户的应用数据目录
     const appDataPath = isWindows

@@ -97,17 +97,18 @@ app.on('activate', () => {
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
   const copyResourceToAppData = require('@/main/ffmpeg/copyResourceToAppData.js');
-  const filePath = process.platform === 'win32' ? 'ffmpeg/win/win.zip' : 'ffmpeg/mac/ffmpeg.zip';
+  const filePath = process.platform === 'win32' ? 'ffmpeg/win/win.zip' : 'ffmpeg/mac/mac.zip';
 
   const getFFmpegPath = require('@/main/ffmpeg/getFFmpegPath.js');
   const checkFileAccess = require('@/main/ffmpeg/checkFileAccess.js');
   const ffmpegPath = getFFmpegPath();
+
   checkFileAccess(ffmpegPath, fs.constants.F_OK)
     .then(() => {
-      log.info('ffmpeg可执行文件存在。');
+      log.info('ffmpeg可执行文件存在。', ffmpegPath);
     })
     .catch((err) => {
-      log.error('ffmpeg可执行文件不存在！', err);
+      log.error('ffmpeg可执行文件不存在！', err, ffmpegPath);
       copyResourceToAppData(filePath)
         .then(() => {
           log.info('Resource copied successfully', filePath);
