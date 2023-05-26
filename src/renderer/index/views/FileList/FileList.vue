@@ -111,7 +111,7 @@ onMounted(() => {
     }
     const taskId = data.taskId;
 
-    const hasTask = fileStore.queueManager.value.getTask(VIDEO_TO_GIF, taskId);
+    const hasTask = fileStore.queueManager.getTask(VIDEO_TO_GIF, taskId);
 
     if (data.name === 'progress' && hasTask) {
       fileStore.setFileList(
