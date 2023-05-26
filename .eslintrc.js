@@ -8,7 +8,11 @@ module.exports = {
     parser: '@babel/eslint-parser'
   },
   globals: {
-    __static: true
+    __static: true,
+    defineProps: 'readonly',
+    defineEmits: 'readonly',
+    defineExpose: 'readonly',
+    withDefaults: 'readonly'
   },
   rules: {
     // 指定规则
