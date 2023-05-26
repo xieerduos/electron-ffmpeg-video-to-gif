@@ -1,6 +1,6 @@
 {
   "name": "togif",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "keywords": [
     "electron",
     "vue",
@@ -19,7 +19,7 @@
     "type": "git",
     "url": "https://github.com/xieerduos/electron-ffmpeg-video-to-gif.git"
   },
-  "description": "Electron template",
+  "description": "视频转Gif图片",
   "scripts": {
     "start": "npm run electron:serve",
     "serve": "vue-cli-service serve",
