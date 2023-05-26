@@ -38,14 +38,27 @@
 </template>
 
 <script setup>
+import {computed} from 'vue';
+import {storeToRefs} from 'pinia';
+import {useFileStore} from '@/renderer/index/store/fileStore.js';
+const fileStore = useFileStore();
+const {fileList} = storeToRefs(fileStore);
+
 const props = defineProps({
   multipleSelection: {type: Array, default: () => []},
-  canAllStart: {type: Number, default: 0},
-  canAllStop: {type: Number, default: 0},
   handleClick: {type: Function, default: () => {}},
   handleClear: {type: Function, default: () => {}},
   handleStart: {type: Function, default: () => {}},
   handleStop: {type: Function, default: () => {}}
+});
+
+const canAllStart = computed(() => {
+  const arr = props.multipleSelection.length > 0 ? props.multipleSelection : fileList.value;
+  return arr.filter((item) => item.status === 3).length;
+});
+const canAllStop = computed(() => {
+  const arr = props.multipleSelection.length > 0 ? props.multipleSelection : fileList.value;
+  return arr.filter((item) => item.status === 1 || item.status === 0).length;
 });
 </script>
 <style lang="scss" scoped>
