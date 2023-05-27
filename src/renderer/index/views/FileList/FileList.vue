@@ -7,7 +7,11 @@
       :handleClear="(selection) => handleClear(selection, true)"
       :handleStart="handleStart"
       :handleStop="(selection) => handleClear(selection, false)"></FileOperations>
-    <FileTable ref="multipleTableRef" :data="fileList" @selection-change="handleSelectionChange"></FileTable>
+    <FileTable
+      ref="multipleTableRef"
+      :data="fileList"
+      :total="fileList.length"
+      @selection-change="handleSelectionChange"></FileTable>
     <input type="file" ref="fileElem" multiple accept="video/*" @change="handleFiles" style="display: none" />
   </div>
 </template>
@@ -38,6 +42,8 @@ const handleClick = () => {
 const handleFiles = (event) => {
   const files = Array.from(event.target.files);
   handleVideoFiles(files);
+  console.log('hanldeFiles', fileElem.value.value);
+  // fileElem.value.value = [];
 };
 
 const handleDrop = (event) => {
@@ -131,7 +137,7 @@ onMounted(() => {
   margin: 0 auto;
   overflow-y: auto;
   overflow-x: hidden;
-  padding: 24px;
+  padding: 24px 24px 0px 24px;
   box-sizing: border-box;
 }
 </style>

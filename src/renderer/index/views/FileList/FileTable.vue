@@ -1,5 +1,11 @@
 <template>
-  <el-table ref="tableRef" :row-key="(row) => row.path" height="calc(100vh - 140px)" style="width: 100%">
+  <el-table
+    v-bind="$attrs"
+    v-on="$attrs"
+    ref="tableRef"
+    :row-key="(row) => row.path"
+    height="calc(100vh - 160px)"
+    style="width: 100%">
     <el-table-column type="selection" reserve-selection width="55" />
     <el-table-column prop="id" label="#" width="50" />
     <el-table-column prop="startTime" label="日期" width="115px">
@@ -45,6 +51,7 @@
       </template>
     </el-table-column>
   </el-table>
+  <p>总计：{{ total }} 条数据</p>
 </template>
 <script setup>
 import {ref} from 'vue';
@@ -53,6 +60,10 @@ import useElectron from '@/renderer/index/composables/useElectron.js';
 import {MAP_STATUS} from '@/renderer/index/utils/constant.js';
 import bytes from 'bytes';
 const tableRef = ref();
+
+const props = defineProps({
+  total: {type: Number, required: true, default: 0}
+});
 
 const {handleResultFolder, handleShowRowFolder} = useElectron();
 
