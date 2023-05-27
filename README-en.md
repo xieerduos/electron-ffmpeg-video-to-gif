@@ -48,6 +48,7 @@ While working on an open-source project on GitHub, I wanted to incorporate GIFs 
 5. FFmpeg executable file turned into a text file after packaging - switched to zip package.
 6. Integrating FFmpeg into our application using asarUnpack.
 7. Electron version issue - versions above 20 do not support direct importing of Node.js modules in preload.js.
+8. When the data reaches 500 records, issues such as lag, delays, and failed state updates occur.
 
 ## Figma Design
 

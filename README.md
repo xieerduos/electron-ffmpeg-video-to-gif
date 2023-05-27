@@ -50,6 +50,7 @@
 5. ffmpeg 可执行文件-打包后变成文本文件 - 改成 zip 包
 6. 如何解决 ffmpeg 集成到我们的应用中 asarUnpack
 7. electron 版本问题，20 版本以上不支持直接在 preload.js 引入 node.js 相关模块
+8. 当数据量达到500条的时候出现卡顿、延迟和更新状态失败等问题
 
 ## Figma 设计稿
 
