@@ -139,10 +139,10 @@ if (!gotTheLock) {
       // Install Vue Devtools
       try {
         // await installExtension(VUEJS3_DEVTOOLS);
-        await installExtension({
-          id: 'ljjemllljcmogpfapbkkighbhhppjdbg', // Vue Devtools beta
-          electron: '>=1.2.1'
-        });
+        // await installExtension({
+        //   id: 'ljjemllljcmogpfapbkkighbhhppjdbg', // Vue Devtools beta
+        //   electron: '>=1.2.1'
+        // });
       } catch (e) {
         log.error('Vue Devtools failed to install:', e.toString());
       }
