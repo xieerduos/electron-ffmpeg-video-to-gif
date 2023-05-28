@@ -53,9 +53,20 @@ export const handleStop = (selection) => {
   const fileStore = useFileStore();
   const current = selection.length > 0 ? selection : fileStore.fileList;
 
-  const inProgress = current.filter((item) => item.status === 1);
-  const notStarted = current.filter((item) => item.status === 0);
+  const {inProgress, notStarted} = current.reduce(
+    (acc, item) => {
+      if (item.status === 1) {
+        acc.inProgress.push(item);
+      }
+      if (item.status === 0) {
+        acc.notStarted.push(item);
+      }
+      return acc;
+    },
+    {inProgress: [], notStarted: []}
+  );
 
+  // 停止正在执行的任务（进行中）
   for (const item of inProgress) {
     const stopTask = window.electronAPI.invoke('toMain', {
       type: VIDEO_STOP_TO_GIF,
@@ -89,14 +100,20 @@ export const handleStop = (selection) => {
       });
   }
 
+  const notStartedIds = [];
+  // 停止等待执行的任务（排队中）
   for (const item of notStarted) {
     const cancelCode = fileStore.queueManager.cancelTask(VIDEO_TO_GIF, item.id);
     const taskId = item.id;
-    console.log('notStarted cancelTask taskId, cancelCode', taskId, cancelCode);
-    fileStore.setFileList(
-      fileStore.fileList.map((task) => {
-        return task.id === taskId ? {...task, status: 3} : task;
-      })
-    );
+    // 更新状态
+    // console.log('notStarted cancelTask taskId, cancelCode', taskId, cancelCode);
+    notStartedIds.push(taskId);
   }
+
+  // 把“排队中”的状态修改为“已停止”
+  fileStore.setFileList(
+    fileStore.fileList.map((task) => {
+      return notStartedIds.includes(task.id) ? {...task, status: 3} : task;
+    })
+  );
 };
