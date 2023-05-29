@@ -11,13 +11,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     }
   },
   invoke: (channel, ...reset) => {
-    const validChannels = ['toMain'];
+    const validChannels = ['toMain', 'titlebar'];
     if (validChannels.includes(channel)) {
       return ipcRenderer.invoke(channel, ...reset);
     }
   },
   receive: (channel, func) => {
-    const validChannels = ['fromMain'];
+    const validChannels = ['fromMain', 'titlebar'];
     if (validChannels.includes(channel)) {
       // 解决无法removeListener问题
       // https://github.com/reZach/secure-electron-template/issues/43#issuecomment-772303787

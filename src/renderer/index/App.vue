@@ -1,8 +1,13 @@
 <template>
-  <router-view></router-view>
+  <TitleBar class="titlebar-container"></TitleBar>
+  <div class="content-wrap">
+    <router-view></router-view>
+  </div>
 </template>
 
-<script setup></script>
+<script setup>
+import TitleBar from '@/renderer/index/components/TitleBar/index.vue';
+</script>
 
 <style>
 html,
@@ -24,7 +29,30 @@ img {
   pointer-events: none;
 }
 
+.region-drag {
+  -webkit-app-region: drag;
+}
+
+.not-drag {
+  -webkit-app-region: no-drag;
+}
+
 #app {
+  display: flex;
+  flex-flow: column nowrap;
+  height: 100vh;
+  width: 100vw;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+.titlebar-container {
+  display: flex;
+  flex-flow: row nowrap;
+  height: 40px;
+}
+
+.content-wrap {
   display: flex;
   flex-flow: row nowrap;
 }

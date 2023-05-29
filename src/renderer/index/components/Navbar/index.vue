@@ -1,6 +1,6 @@
 <template>
-  <div class="menu-container">
-    <div class="logo-wrap">
+  <div class="menu-container region-drag">
+    <div class="logo-wrap not-drag">
       <img width="40" src="@/renderer/index/assets/logo.png" alt="logo.png" />
     </div>
   </div>

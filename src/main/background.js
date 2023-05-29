@@ -45,7 +45,9 @@ if (!gotTheLock) {
       height: 620,
       minWidth: 900,
       minHeight: 600,
+      frame: false,
       autoHideMenuBar: true, // 自动隐藏菜单
+      titleBarStyle: 'hiddenInset',
       title: ' ', // 标题
       // eslint-disable-next-line no-undef
       icon: path.join(__static, `icons/${process.platform === 'win32' ? 'win/icon.ico' : 'png/icon.png'}`),
@@ -147,7 +149,12 @@ if (!gotTheLock) {
         log.error('Vue Devtools failed to install:', e.toString());
       }
     }
+
     createWindow();
+
+    const useTitlebar = require('@/main/titlebar/index.js');
+    useTitlebar(windowManager.mainWindow);
+
     const tray = require('@/main/tray/index.js');
 
     const ffmpeg = require('@/main/ffmpeg/index.js');

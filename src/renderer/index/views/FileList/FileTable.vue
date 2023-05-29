@@ -5,7 +5,7 @@
     :row-key="(row) => row.id"
     v-bind="$attrs"
     v-on="$attrs"
-    height="calc(100vh - 160px)"
+    height="calc(100vh - 160px - 40px)"
     style="width: 100%">
     <el-table-column type="selection" reserve-selection width="55" align="center" />
     <el-table-column type="index" :index="calculateIndex" label="序号" width="55" align="center" />

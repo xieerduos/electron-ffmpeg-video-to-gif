@@ -17,7 +17,7 @@
 </template>
 
 <script setup>
-import {onMounted, ref} from 'vue';
+import {onBeforeUnmount, onMounted, ref} from 'vue';
 import Navbar from '@/renderer/index/components/Navbar/index.vue';
 import getNextId from '@/renderer/index/utils/getNextId.js';
 import {VIDEO_TO_GIF} from '@/renderer/index/utils/constant.js';
@@ -110,8 +110,10 @@ onMounted(() => {
   );
 });
 
+let removeListener = null;
+
 onMounted(() => {
-  window.electronAPI.receive('fromMain', (event, data = {}) => {
+  removeListener = window.electronAPI.receive('fromMain', (event, data = {}) => {
     if (!(data && typeof data === 'object' && data.type === VIDEO_TO_GIF)) {
       return;
     }
@@ -128,12 +130,15 @@ onMounted(() => {
     }
   });
 });
+onBeforeUnmount(() => {
+  removeListener && removeListener();
+});
 </script>
 
 <style lang="scss" scoped>
 .content-container {
   flex: 1;
-  height: 100vh;
+  height: calc(100vh - 40px);
   margin: 0 auto;
   overflow-y: auto;
   overflow-x: hidden;
