@@ -3,6 +3,7 @@
   <div class="content-container" @dragover.prevent @dragenter.prevent @drop="handleDrop">
     <FileOperations
       :multipleSelection="multipleSelection"
+      :handleCancel="handleCancel"
       :handleClick="handleClick"
       :handleClear="(selection) => handleClear(selection, true)"
       :handleStart="handleStart"
@@ -99,6 +100,10 @@ const handleClear = (selection, isDelete = true) => {
     );
   }
 
+  multipleTableRef.value?.getTableRef()?.clearSelection();
+};
+
+const handleCancel = () => {
   multipleTableRef.value?.getTableRef()?.clearSelection();
 };
 

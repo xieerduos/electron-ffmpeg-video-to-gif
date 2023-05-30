@@ -9,14 +9,34 @@
         v-show="canAllStart > 0"
         type="primary"
         plain
+        title="点击将会重新开始选中已停止的任务"
         @click="handleStart(multipleSelection)"
         >开始({{ canAllStart }})</el-button
       >
-      <el-button style="width: 90px" v-show="canAllStop > 0" type="danger" plain @click="handleStop(multipleSelection)"
+      <el-button
+        style="width: 90px"
+        v-show="canAllStop > 0"
+        type="danger"
+        plain
+        title="点击将会停止任务"
+        @click="handleStop(multipleSelection)"
         >停止({{ canAllStop }})</el-button
       >
-      <el-button style="width: 90px" type="danger" plain @click="handleClear(multipleSelection)"
+      <el-button
+        style="width: 90px"
+        type="danger"
+        plain
+        title="点击将会停止任务和清除记录"
+        @click="handleClear(multipleSelection)"
         >清除({{ multipleSelection.length }})</el-button
+      >
+      <el-button
+        style="width: 90px"
+        type="default"
+        plain
+        title="点击将会取消选中"
+        @click="handleClear(multipleSelection)"
+        >取消选中({{ multipleSelection.length }})</el-button
       >
     </template>
     <el-button
@@ -31,7 +51,7 @@
       :disabled="multipleSelection.length > 0 || canAllStop === 0"
       type="danger"
       plain
-      @click="handleStop(multipleSelection)"
+      @click="handleCancel(multipleSelection)"
       >全部停止</el-button
     >
   </div>
@@ -46,6 +66,7 @@ const {fileList} = storeToRefs(fileStore);
 
 const props = defineProps({
   multipleSelection: {type: Array, default: () => []},
+  handleCancel: {type: Function, default: () => {}},
   handleClick: {type: Function, default: () => {}},
   handleClear: {type: Function, default: () => {}},
   handleStart: {type: Function, default: () => {}},
