@@ -1,5 +1,21 @@
 ## 需求拆解实现
 
+## 修复 bug
+
+1. 修复 Mac dark 图标太大的问题，图标改为 80% 其他透明
+2. 修复关闭图标含有 70%的透明度问题
+3. 修复隐藏打开的关闭图标会有一个图标闪烁问题
+
+## 增加 titlebar
+
+1. electron 如何自定义 titlebar
+2. electron 主进程与渲染进程之间的相互通信
+3. Vue3 如何创建和使用图标组件 SvgIcon
+4. eslint 忽略文件夹
+5. 配置无边框窗口和配置 Mac 红绿灯
+6. ipc 获取 Windows 或者 Mac 平台
+7. 如何使用 css 使得窗口变成可拖拽
+
 ## 遇到的问题
 
 1. Mac Resources 目录执行权限不足问题
@@ -53,13 +69,3 @@
 5. 未来优化
 
 当数量量更多的时候，可以考虑数据库来存储数据 sqlite
-
-## 增加 titlebar
-
-1. electron 如何自定义 titlebar
-2. electron 主进程与渲染进程之间的相互通信
-3. Vue3 如何创建和使用图标组件 SvgIcon
-4. eslint 忽略文件夹
-5. 配置无边框窗口和配置 Mac 红绿灯
-6. ipc 获取 Windows 或者 Mac 平台
-7. 如何使用 css 使得窗口变成可拖拽

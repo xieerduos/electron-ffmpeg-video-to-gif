@@ -5,7 +5,9 @@
       <li class="titlebar-item not-drag" @click="toggleMaximize">
         <IconMaximize v-if="!isMaximized && !isFullScreen" /> <IconRestore v-else />
       </li>
-      <li class="titlebar-item is-close not-drag" @click="closeWindow"><IconClose /></li>
+      <li class="titlebar-item is-close not-drag" :class="{'not-hover': isNotHover}" @click="closeWindow">
+        <IconClose />
+      </li>
     </ul>
   </div>
 </template>
@@ -15,11 +17,12 @@ import IconClose from '@/renderer/index/components/SvgIcon/IconClose.vue';
 import IconMaximize from '@/renderer/index/components/SvgIcon/IconMaximize.vue';
 import IconMinimize from '@/renderer/index/components/SvgIcon/IconMinimize.vue';
 import IconRestore from '@/renderer/index/components/SvgIcon/IconRestore.vue';
-import {onBeforeUnmount, onMounted, ref} from 'vue';
+import {nextTick, onBeforeUnmount, onMounted, ref} from 'vue';
 
 const isFullScreen = ref(false);
 const isMaximized = ref(false);
 const isWindows = ref(false);
+const isNotHover = ref(false);
 
 const minimizeWindow = () => {
   window.electronAPI.invoke('titlebar', {type: 'minimizeWindow'});
@@ -34,7 +37,11 @@ const toggleMaximize = () => {
 };
 
 const closeWindow = () => {
+  isNotHover.value = true;
   window.electronAPI.invoke('titlebar', {type: 'closeWindow'});
+  setTimeout(() => {
+    isNotHover.value = false;
+  }, 100);
 };
 
 let removeListener = null;
@@ -94,6 +101,9 @@ onBeforeUnmount(() => {
   &.is-close:hover {
     color: #fff;
     background: rgba(232, 17, 35, 0.7);
+  }
+  &.is-close.not-hover:hover {
+    background-color: transparent;
   }
 }
 

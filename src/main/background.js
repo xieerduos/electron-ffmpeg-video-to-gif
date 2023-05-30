@@ -165,7 +165,7 @@ if (!gotTheLock) {
 
     if (process.platform === 'darwin') {
       // 仅在 macOS 上设置 Dock 图标
-      const iconPath = path.join(__static, 'icons/png/512x512.png');
+      const iconPath = path.join(__static, 'logo-mac.png');
       app.dock.setIcon(iconPath);
     }
   });
