@@ -28,7 +28,7 @@
 3. html,css,javascript,vue3
 4. vue-cli,vue-cli-plugin-electron-builder,electron-builder
 5. electron-log
-6. element-plus
+6. element-plus,pinia
 7. ffmpeg
 8. eslint,prettier,commitlint,.husky
 9. sudo-prompt
