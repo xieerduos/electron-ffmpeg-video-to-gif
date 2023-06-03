@@ -27,6 +27,7 @@ import FileOperations from './FileOperations.vue';
 import {storeToRefs} from 'pinia';
 import {useFileStore} from '@/renderer/index/store/fileStore.js';
 import {handleSendToMain, handleStop} from '@/renderer/index/composables/useFileList.js';
+import queueManager from '@/renderer/index/composables/queueManager.js';
 
 const fileElem = ref();
 
@@ -124,7 +125,7 @@ onMounted(() => {
     }
     const taskId = data.taskId;
 
-    const hasTask = fileStore.queueManager.getTask(VIDEO_TO_GIF, taskId);
+    const hasTask = queueManager.getTask(VIDEO_TO_GIF, taskId);
 
     if (data.name === 'progress' && hasTask) {
       fileStore.setFileList(
