@@ -35,7 +35,7 @@
         type="default"
         plain
         title="点击将会取消选中"
-        @click="handleClear(multipleSelection)"
+        @click="handleCancel(multipleSelection)"
         >取消选中({{ multipleSelection.length }})</el-button
       >
     </template>
@@ -51,7 +51,7 @@
       :disabled="multipleSelection.length > 0 || canAllStop === 0"
       type="danger"
       plain
-      @click="handleCancel(multipleSelection)"
+      @click="handleStop(multipleSelection)"
       >全部停止</el-button
     >
   </div>
