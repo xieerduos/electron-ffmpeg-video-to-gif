@@ -3,6 +3,7 @@
     ref="tableRef"
     :data="tableData"
     :row-key="(row) => row.id"
+    @row-contextmenu="onRowClick"
     v-bind="$attrs"
     v-on="$attrs"
     height="calc(100vh - 160px - 40px)"
@@ -81,7 +82,7 @@ const props = defineProps({
 
 const tableRef = ref();
 
-const defaultCurrentPage = Number(localStorage.getItem('currentPage') || 1);
+const defaultCurrentPage = 1;
 const defaultPageSize = Number(localStorage.getItem('pageSize') || 10);
 
 const currentPage = ref(Number.isNaN(defaultCurrentPage) ? 1 : defaultCurrentPage);
@@ -99,12 +100,14 @@ const calculateIndex = (index) => {
 };
 
 const handleSizeChange = (val) => {
-  localStorage.setItem('currentPage', currentPage.value);
   localStorage.setItem('pageSize', pageSize.value);
 };
 const handleCurrentChange = (val) => {
-  localStorage.setItem('currentPage', currentPage.value);
   localStorage.setItem('pageSize', pageSize.value);
+};
+
+const onRowClick = (row) => {
+  console.log('[onRowClick]', JSON.parse(JSON.stringify(row)));
 };
 
 defineExpose({
