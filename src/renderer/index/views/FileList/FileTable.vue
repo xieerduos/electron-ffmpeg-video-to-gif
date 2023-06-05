@@ -67,11 +67,12 @@
   </p>
 </template>
 <script setup>
-import {computed, ref} from 'vue';
+import {onMounted, defineExpose, computed, ref} from 'vue';
 import dayjs from 'dayjs';
 import useElectron from '@/renderer/index/composables/useElectron.js';
 import {MAP_STATUS} from '@/renderer/index/utils/constant.js';
 import bytes from 'bytes';
+import Sortable from 'sortablejs';
 
 const {handleResultFolder, handleShowRowFolder} = useElectron();
 
@@ -79,8 +80,6 @@ const props = defineProps({
   data: {type: Array, required: true, default: () => []},
   total: {type: Number, required: true, default: 0}
 });
-
-const tableRef = ref();
 
 const defaultCurrentPage = 1;
 const defaultPageSize = Number(localStorage.getItem('pageSize') || 10);
@@ -109,6 +108,18 @@ const handleCurrentChange = (val) => {
 const onRowClick = (row) => {
   console.log('[onRowClick]', JSON.parse(JSON.stringify(row)));
 };
+
+const tableRef = ref();
+
+onMounted(() => {
+  Sortable.create(tableRef.value.$el.querySelector('.el-table__body-wrapper tbody'), {
+    animation: 150,
+    onEnd: ({newIndex, oldIndex}) => {
+      const currRow = tableData.value.splice(oldIndex, 1)[0];
+      tableData.value.splice(newIndex, 0, currRow);
+    }
+  });
+});
 
 defineExpose({
   getTableRef: () => tableRef.value

@@ -45,6 +45,7 @@
     "electron-log": "^4.4.8",
     "element-plus": "^2.3.5",
     "pinia": "^2.1.3",
+    "sortablejs": "^1.15.0",
     "sudo-prompt": "^9.2.1",
     "vue": "^3.2.13",
     "vue-router": "^4.0.3"
