@@ -39,6 +39,9 @@ export const handleSendToMain = (values) => {
           })
           .catch((error) => {
             console.error('error', error, current.id);
+            if (error?.message?.includes('such file or directory')) {
+              ElMessage({type: 'error', message: current.path + ' 文件不存在', grouping: true});
+            }
             fileStore.setFileList(
               fileStore.fileList.map((item) => {
                 return item.id === current.id ? {...item, status: 3} : item;

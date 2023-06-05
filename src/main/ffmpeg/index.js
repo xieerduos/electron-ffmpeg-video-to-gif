@@ -1,6 +1,7 @@
 const path = require('path');
 const os = require('os');
 const convertWithFFmpeg = require('./convertWithFFmpeg.js');
+const checkFileAccess = require('./checkFileAccess.js');
 const {ipcMain, shell, app} = require('electron');
 const log = require('@/main/log/index.js');
 const fs = require('fs');
@@ -64,7 +65,7 @@ function convertAbortVideoToGif(message) {
   return Promise.reject(new Error({message: '停止失败 未找到任务:', taskId: message.taskId, current}));
 }
 
-function convertVideoToGif(mainWindow, message) {
+async function convertVideoToGif(mainWindow, message) {
   const input = message.input;
   const frameRate = message.frameRate || 10;
   const taskId = message.taskId;
@@ -72,6 +73,16 @@ function convertVideoToGif(mainWindow, message) {
   if ([input, taskId].filter((item) => !item).length > 0) {
     return Promise.reject(new Error({message: '参数错误', data: message}));
   }
+
+  // 判断文件是否存在，如果不存在，直接抛出错误
+  await checkFileAccess(input, fs.constants.F_OK)
+    .then(() => {
+      log.info(`${input} 文件存在`);
+    })
+    .catch((err) => {
+      log.error(`${input} 文件不存在`, err);
+      throw err;
+    });
 
   // const output = path.join(os.homedir(), 'Downloads', fileName + '.gif');
   const output = getResultPath(input);
