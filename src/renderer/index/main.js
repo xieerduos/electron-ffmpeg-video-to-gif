@@ -10,7 +10,6 @@ import locale from 'element-plus/lib/locale/lang/zh-cn';
 const pinia = createPinia();
 
 const app = createApp(App);
-// 如果您正在使用CDN引入，请删除下面一行。
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);

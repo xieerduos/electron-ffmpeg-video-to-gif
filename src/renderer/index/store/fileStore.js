@@ -1,13 +1,11 @@
 import {defineStore} from 'pinia';
-import QueueManager from '@/renderer/index/utils/QueueManager.js';
 
 export const useFileStore = defineStore('fileStore', {
   state: () => {
     const defaultList = localStorage.getItem('fileList');
 
     return {
-      fileList: defaultList ? JSON.parse(defaultList) : [],
-      queueManager: new QueueManager(3)
+      fileList: defaultList ? JSON.parse(defaultList) : []
     };
   },
   getters: {},

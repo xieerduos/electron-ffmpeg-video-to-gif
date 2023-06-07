@@ -1,6 +1,7 @@
 import {ElMessage} from 'element-plus';
 import {VIDEO_TO_GIF, VIDEO_STOP_TO_GIF} from '@/renderer/index/utils/constant.js';
 import {useFileStore} from '@/renderer/index/store/fileStore.js';
+import queueManager from '@/renderer/index/composables/queueManager.js';
 
 export const handleSendToMain = (values) => {
   const fileStore = useFileStore();
@@ -10,7 +11,7 @@ export const handleSendToMain = (values) => {
     })
   );
   for (const current of values) {
-    fileStore.queueManager.enqueue({
+    queueManager.enqueue({
       uuid: VIDEO_TO_GIF,
       key: current.id,
       fetch: () => {
@@ -38,6 +39,9 @@ export const handleSendToMain = (values) => {
           })
           .catch((error) => {
             console.error('error', error, current.id);
+            if (error?.message?.includes('such file or directory')) {
+              ElMessage({type: 'error', message: current.path + ' 文件不存在', grouping: true});
+            }
             fileStore.setFileList(
               fileStore.fileList.map((item) => {
                 return item.id === current.id ? {...item, status: 3} : item;
@@ -84,7 +88,7 @@ export const handleStop = (selection) => {
       })
       .catch((error) => {
         console.error(item.id, '停止失败', error);
-        const cancelCode = fileStore.queueManager.cancelTask(VIDEO_TO_GIF, item.id);
+        const cancelCode = queueManager.cancelTask(VIDEO_TO_GIF, item.id);
         console.log('inProgress cancelTask taskId, cancelCode', item.id, cancelCode);
         const taskId = item.id;
 
@@ -103,7 +107,7 @@ export const handleStop = (selection) => {
   const notStartedIds = [];
   // 停止等待执行的任务（排队中）
   for (const item of notStarted) {
-    const cancelCode = fileStore.queueManager.cancelTask(VIDEO_TO_GIF, item.id);
+    const cancelCode = queueManager.cancelTask(VIDEO_TO_GIF, item.id);
     const taskId = item.id;
     // 更新状态
     // console.log('notStarted cancelTask taskId, cancelCode', taskId, cancelCode);

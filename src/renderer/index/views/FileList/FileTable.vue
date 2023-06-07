@@ -3,6 +3,7 @@
     ref="tableRef"
     :data="tableData"
     :row-key="(row) => row.id"
+    @row-contextmenu="onRowClick"
     v-bind="$attrs"
     v-on="$attrs"
     height="calc(100vh - 160px - 40px)"
@@ -66,11 +67,12 @@
   </p>
 </template>
 <script setup>
-import {computed, ref} from 'vue';
+import {onMounted, defineExpose, computed, ref, onBeforeUnmount} from 'vue';
 import dayjs from 'dayjs';
 import useElectron from '@/renderer/index/composables/useElectron.js';
 import {MAP_STATUS} from '@/renderer/index/utils/constant.js';
 import bytes from 'bytes';
+import Sortable from 'sortablejs';
 
 const {handleResultFolder, handleShowRowFolder} = useElectron();
 
@@ -79,9 +81,7 @@ const props = defineProps({
   total: {type: Number, required: true, default: 0}
 });
 
-const tableRef = ref();
-
-const defaultCurrentPage = Number(localStorage.getItem('currentPage') || 1);
+const defaultCurrentPage = 1;
 const defaultPageSize = Number(localStorage.getItem('pageSize') || 10);
 
 const currentPage = ref(Number.isNaN(defaultCurrentPage) ? 1 : defaultCurrentPage);
@@ -99,13 +99,58 @@ const calculateIndex = (index) => {
 };
 
 const handleSizeChange = (val) => {
-  localStorage.setItem('currentPage', currentPage.value);
   localStorage.setItem('pageSize', pageSize.value);
 };
 const handleCurrentChange = (val) => {
-  localStorage.setItem('currentPage', currentPage.value);
   localStorage.setItem('pageSize', pageSize.value);
 };
+
+const onRowClick = (row) => {
+  console.log('[onRowClick]', JSON.parse(JSON.stringify(row)));
+};
+
+const tableRef = ref();
+const sortableInstanceRow = ref(null);
+const sortableInstanceColumn = ref(null);
+
+onMounted(() => {
+  sortableInstanceRow.value = Sortable.create(tableRef.value.$el.querySelector('.el-table__body-wrapper tbody'), {
+    animation: 150,
+    onEnd: ({newIndex, oldIndex}) => {
+      const currRow = tableData.value.splice(oldIndex, 1)[0];
+      tableData.value.splice(newIndex, 0, currRow);
+    }
+  });
+  sortableInstanceRow.value = Sortable.create(tableRef.value.$el.querySelector('.el-table__header-wrapper thead tr'), {
+    animation: 150,
+    onMove: () => {},
+    onUpdate: () => {},
+    onSort: () => {},
+    onEnd: ({newIndex, oldIndex}) => {
+      // 获取表格列定义
+      const table = tableRef.value;
+      const oldColumns = table.store.states.columns;
+
+      // 重新排列列定义的顺序
+      const newColumns = [...oldColumns.value];
+      const movedColumn = newColumns.splice(oldIndex, 1)[0];
+      newColumns.splice(newIndex, 0, movedColumn);
+
+      oldColumns.value = newColumns;
+    }
+  });
+});
+
+onBeforeUnmount(() => {
+  if (sortableInstanceRow.value) {
+    sortableInstanceRow.value.destroy();
+    sortableInstanceRow.value = null;
+  }
+  if (sortableInstanceColumn.value) {
+    sortableInstanceColumn.value.destroy();
+    sortableInstanceColumn.value = null;
+  }
+});
 
 defineExpose({
   getTableRef: () => tableRef.value
