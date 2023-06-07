@@ -73,7 +73,7 @@ const handleVideoFiles = (files) => {
     }));
     fileList.value.push(...values);
 
-    console.log(files);
+    // console.log(files);
 
     handleSendToMain(values);
     multipleTableRef.value?.getTableRef()?.clearSelection();
