@@ -16,6 +16,7 @@ module.exports = {
   },
   rules: {
     // 指定规则
+    'vue/valid-v-slot': 'off',
     'vue/no-parsing-error': [
       // 禁止Vue.js错误
       2, // 错误级别为error

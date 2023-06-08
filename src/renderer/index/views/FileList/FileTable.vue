@@ -8,42 +8,41 @@
     v-on="$attrs"
     height="calc(100vh - 160px - 40px)"
     style="width: 100%">
-    <el-table-column type="selection" reserve-selection width="55" align="center" />
-    <el-table-column type="index" :index="calculateIndex" label="序号" width="55" align="center" />
-    <el-table-column prop="startTime" label="日期" width="114px">
-      <template #default="scope">
+    <el-table-column
+      v-for="propertiesItem in propertiesArray"
+      :reserve-selection="propertiesItem.reserveSelection"
+      :index="propertiesItem.index"
+      :key="propertiesItem.prop"
+      :prop="propertiesItem.prop"
+      :label="propertiesItem.label"
+      :type="propertiesItem.type"
+      :width="propertiesItem.width"
+      :align="propertiesItem.align">
+      <template v-if="propertiesItem.prop === 'startTime'" #default="scope">
         {{ scope.row.startTime ? dayjs(scope.row.startTime).format('YYYY/MM/DD HH:mm:ss') : '' }}
       </template>
-    </el-table-column>
-    <el-table-column prop="id" label="任务ID" width="70" align="center" />
-    <el-table-column prop="name" label="文件名称">
-      <template #default="scope">
+
+      <template v-if="propertiesItem.prop === 'name'" #default="scope">
         <span class="file-name" @click="handleShowRowFolder(scope.row.path)" :title="scope.row.path">{{
           scope.row.name
         }}</span>
       </template>
-    </el-table-column>
-    <el-table-column prop="size" label="大小" width="100px">
-      <template #default="scope">
+
+      <template v-if="propertiesItem.prop === 'size'" #default="scope">
         {{ bytes(scope.row.size) }}
       </template>
-    </el-table-column>
-    <el-table-column prop="status" label="状态" align="center" width="100px">
-      <template #default="scope">
+      <template v-if="propertiesItem.prop === 'status'" #default="scope">
         <el-tag class="disabled-transitions" :type="MAP_STATUS.get(scope.row.status).tag">{{
           MAP_STATUS.get(scope.row.status).text
         }}</el-tag>
       </template>
-    </el-table-column>
-    <el-table-column prop="progress" label="完成进度" align="left">
-      <template #default="scope">
+      <template v-if="propertiesItem.prop === 'progress'" #default="scope">
         <div class="progress-wrap">
           <el-progress :percentage="scope.row.progress" :format="(percentage) => percentage.toFixed(1) + '%'" />
         </div>
       </template>
-    </el-table-column>
-    <el-table-column prop="" label="操作" align="center" width="100px">
-      <template #default="scope">
+
+      <template v-if="propertiesItem.prop === 'operations'" #default="scope">
         <el-button
           @click="handleResultFolder(scope.row)"
           :disabled="scope.row.status !== 2"
@@ -67,7 +66,7 @@
   </p>
 </template>
 <script setup>
-import {onMounted, defineExpose, computed, ref, onBeforeUnmount} from 'vue';
+import {onMounted, defineExpose, computed, ref, onBeforeUnmount, nextTick} from 'vue';
 import dayjs from 'dayjs';
 import useElectron from '@/renderer/index/composables/useElectron.js';
 import {MAP_STATUS} from '@/renderer/index/utils/constant.js';
@@ -113,6 +112,43 @@ const tableRef = ref();
 const sortableInstanceRow = ref(null);
 const sortableInstanceColumn = ref(null);
 
+const propertiesArray = ref([
+  {prop: 'selection', type: 'selection', label: '', reserveSelection: true, width: '55px', align: 'center'},
+  {prop: 'index', type: 'index', label: '序号', index: calculateIndex, width: '55px', align: 'center'},
+  {prop: 'startTime', type: '', label: '日期', width: '114px', align: ''},
+  {prop: 'id', type: '', label: '任务ID', width: '', align: 'center'},
+  {prop: 'name', type: '', label: '文件名称', width: '', align: ''},
+  {prop: 'size', type: '', label: '大小', width: '', align: 'center'},
+  {prop: 'status', type: '', label: '状态', width: '100px', align: 'center'},
+  {prop: 'progress', type: '', label: '完成进度', width: '', align: ''},
+  {prop: 'operations', type: '', label: '操作', width: '100px', align: 'center'}
+]);
+
+function sortArrayByProperties(objArray, sortPropertiesBy) {
+  const sortOrder = {};
+  for (let i = 0; i < sortPropertiesBy.length; i++) {
+    sortOrder[sortPropertiesBy[i]] = i;
+  }
+
+  return objArray.sort((a, b) => {
+    return sortOrder[a.prop] - sortOrder[b.prop];
+  });
+}
+
+onMounted(() => {
+  try {
+    let sortPropertiesBy = localStorage.getItem('sortPropertiesBy');
+
+    if (sortPropertiesBy) {
+      sortPropertiesBy = JSON.parse(sortPropertiesBy);
+
+      propertiesArray.value = sortArrayByProperties(propertiesArray.value, sortPropertiesBy);
+    }
+  } catch (error) {
+    console.error('[onMounted set propertiesArray error]', error);
+  }
+});
+
 onMounted(() => {
   sortableInstanceRow.value = Sortable.create(tableRef.value.$el.querySelector('.el-table__body-wrapper tbody'), {
     animation: 150,
@@ -137,6 +173,8 @@ onMounted(() => {
       newColumns.splice(newIndex, 0, movedColumn);
 
       oldColumns.value = newColumns;
+
+      localStorage.setItem('sortPropertiesBy', JSON.stringify(oldColumns.value.map((item) => item.property)));
     }
   });
 });
