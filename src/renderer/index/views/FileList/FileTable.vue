@@ -66,7 +66,7 @@
   </p>
 </template>
 <script setup>
-import {onMounted, defineExpose, computed, ref, onBeforeUnmount, nextTick} from 'vue';
+import {onMounted, computed, ref, onBeforeUnmount, nextTick} from 'vue';
 import dayjs from 'dayjs';
 import useElectron from '@/renderer/index/composables/useElectron.js';
 import {MAP_STATUS} from '@/renderer/index/utils/constant.js';
