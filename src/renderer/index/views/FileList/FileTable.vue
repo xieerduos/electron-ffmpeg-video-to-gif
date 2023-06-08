@@ -66,12 +66,13 @@
   </p>
 </template>
 <script setup>
-import {onMounted, computed, ref, onBeforeUnmount, nextTick} from 'vue';
+import {ref} from 'vue';
 import dayjs from 'dayjs';
 import useElectron from '@/renderer/index/composables/useElectron.js';
 import {MAP_STATUS} from '@/renderer/index/utils/constant.js';
 import bytes from 'bytes';
-import Sortable from 'sortablejs';
+import useTable from '@/renderer/index/composables/FileTable/useTable.js';
+import useSortable from '@/renderer/index/composables/FileTable/useSortable.js';
 
 const {handleResultFolder, handleShowRowFolder} = useElectron();
 
@@ -79,116 +80,15 @@ const props = defineProps({
   data: {type: Array, required: true, default: () => []},
   total: {type: Number, required: true, default: 0}
 });
+const tableRef = ref();
 
-const defaultCurrentPage = 1;
-const defaultPageSize = Number(localStorage.getItem('pageSize') || 10);
+const {currentPage, pageSize, tableData, calculateIndex, handleSizeChange, handleCurrentChange} = useTable({props});
 
-const currentPage = ref(Number.isNaN(defaultCurrentPage) ? 1 : defaultCurrentPage);
-const pageSize = ref(Number.isNaN(defaultPageSize) ? 10 : defaultPageSize);
-
-const tableData = computed(() => {
-  const startIndex = (currentPage.value - 1) * pageSize.value;
-  const endIndex = startIndex + pageSize.value;
-  return props.data.slice(startIndex, endIndex);
-});
-
-const calculateIndex = (index) => {
-  const startIndex = (currentPage.value - 1) * pageSize.value;
-  return startIndex + index + 1;
-};
-
-const handleSizeChange = (val) => {
-  localStorage.setItem('pageSize', pageSize.value);
-};
-const handleCurrentChange = (val) => {
-  localStorage.setItem('pageSize', pageSize.value);
-};
+const {propertiesArray} = useSortable({tableData, tableRef, calculateIndex});
 
 const onRowClick = (row) => {
   console.log('[onRowClick]', JSON.parse(JSON.stringify(row)));
 };
-
-const tableRef = ref();
-const sortableInstanceRow = ref(null);
-const sortableInstanceColumn = ref(null);
-
-const propertiesArray = ref([
-  {prop: 'selection', type: 'selection', label: '', reserveSelection: true, width: '55px', align: 'center'},
-  {prop: 'index', type: 'index', label: '序号', index: calculateIndex, width: '55px', align: 'center'},
-  {prop: 'startTime', type: '', label: '日期', width: '114px', align: ''},
-  {prop: 'id', type: '', label: '任务ID', width: '', align: 'center'},
-  {prop: 'name', type: '', label: '文件名称', width: '', align: ''},
-  {prop: 'size', type: '', label: '大小', width: '', align: 'center'},
-  {prop: 'status', type: '', label: '状态', width: '100px', align: 'center'},
-  {prop: 'progress', type: '', label: '完成进度', width: '', align: ''},
-  {prop: 'operations', type: '', label: '操作', width: '100px', align: 'center'}
-]);
-
-function sortArrayByProperties(objArray, sortPropertiesBy) {
-  const sortOrder = {};
-  for (let i = 0; i < sortPropertiesBy.length; i++) {
-    sortOrder[sortPropertiesBy[i]] = i;
-  }
-
-  return objArray.sort((a, b) => {
-    return sortOrder[a.prop] - sortOrder[b.prop];
-  });
-}
-
-onMounted(() => {
-  try {
-    let sortPropertiesBy = localStorage.getItem('sortPropertiesBy');
-
-    if (sortPropertiesBy) {
-      sortPropertiesBy = JSON.parse(sortPropertiesBy);
-
-      propertiesArray.value = sortArrayByProperties(propertiesArray.value, sortPropertiesBy);
-    }
-  } catch (error) {
-    console.error('[onMounted set propertiesArray error]', error);
-  }
-});
-
-onMounted(() => {
-  sortableInstanceRow.value = Sortable.create(tableRef.value.$el.querySelector('.el-table__body-wrapper tbody'), {
-    animation: 150,
-    onEnd: ({newIndex, oldIndex}) => {
-      const currRow = tableData.value.splice(oldIndex, 1)[0];
-      tableData.value.splice(newIndex, 0, currRow);
-    }
-  });
-  sortableInstanceRow.value = Sortable.create(tableRef.value.$el.querySelector('.el-table__header-wrapper thead tr'), {
-    animation: 150,
-    onMove: () => {},
-    onUpdate: () => {},
-    onSort: () => {},
-    onEnd: ({newIndex, oldIndex}) => {
-      // 获取表格列定义
-      const table = tableRef.value;
-      const oldColumns = table.store.states.columns;
-
-      // 重新排列列定义的顺序
-      const newColumns = [...oldColumns.value];
-      const movedColumn = newColumns.splice(oldIndex, 1)[0];
-      newColumns.splice(newIndex, 0, movedColumn);
-
-      oldColumns.value = newColumns;
-
-      localStorage.setItem('sortPropertiesBy', JSON.stringify(oldColumns.value.map((item) => item.property)));
-    }
-  });
-});
-
-onBeforeUnmount(() => {
-  if (sortableInstanceRow.value) {
-    sortableInstanceRow.value.destroy();
-    sortableInstanceRow.value = null;
-  }
-  if (sortableInstanceColumn.value) {
-    sortableInstanceColumn.value.destroy();
-    sortableInstanceColumn.value = null;
-  }
-});
 
 defineExpose({
   getTableRef: () => tableRef.value
