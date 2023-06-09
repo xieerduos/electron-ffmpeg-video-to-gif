@@ -23,9 +23,13 @@
       </template>
 
       <template v-if="propertiesItem.prop === 'name'" #default="scope">
-        <span class="file-name" @click="handleShowRowFolder(scope.row.path)" :title="scope.row.path">{{
-          scope.row.name
-        }}</span>
+        <span
+          class="file-name text-ellipsis"
+          @click="handleShowRowFolder(scope.row.path)"
+          :data-id="scope.row.id"
+          :title="scope.row.path"
+          >{{ scope.row.name }}</span
+        >
       </template>
 
       <template v-if="propertiesItem.prop === 'size'" #default="scope">
@@ -66,13 +70,14 @@
   </p>
 </template>
 <script setup>
-import {ref} from 'vue';
+import {ref, nextTick} from 'vue';
 import dayjs from 'dayjs';
 import useElectron from '@/renderer/index/composables/useElectron.js';
 import {MAP_STATUS} from '@/renderer/index/utils/constant.js';
 import bytes from 'bytes';
 import useTable from '@/renderer/index/composables/FileTable/useTable.js';
 import useSortable from '@/renderer/index/composables/FileTable/useSortable.js';
+import useIntersectionObserver from '@/renderer/index/composables/useIntersectionObserver.js';
 
 const {handleResultFolder, handleShowRowFolder} = useElectron();
 
@@ -85,6 +90,46 @@ const tableRef = ref();
 const {currentPage, pageSize, tableData, calculateIndex, handleSizeChange, handleCurrentChange} = useTable({props});
 
 const {propertiesArray} = useSortable({tableData, tableRef, calculateIndex});
+useIntersectionObserver({
+  tableData,
+  tableRef,
+  loadMoreCallback
+});
+let isLoading = false;
+async function loadMoreCallback(lastItem) {
+  // console.log('lastItem', lastItem);
+  // 如果滚动到底部的数据不是最后一页，那么加载更多
+  const pagination = lastItem.pagination;
+  console.log('pagination', pagination);
+  if (pagination.total > pagination.currentPage * pagination.pageSize && !isLoading) {
+    isLoading = true;
+    console.log('pagination1');
+
+    // 还有数据尚未加载完成，执行加载更多操作
+    const currentPageNum = pagination.currentPage + 1;
+    const startIndex = (currentPageNum - 1) * pageSize.value;
+    const endIndex = startIndex + pageSize.value;
+    const currentArray = props.data.slice(startIndex, endIndex).map((item) => {
+      return {
+        ...item,
+        pagination: {total: props.data.length, currentPage: currentPageNum, pageSize: pageSize.value}
+      };
+    });
+
+    tableData.value = tableData.value.concat(...currentArray).slice(-30);
+    currentPage.value = currentPageNum;
+
+    await nextTick();
+
+    const lastSelector = `[data-id="${lastItem.id}"]`;
+    const lastRow = document.querySelector(lastSelector);
+    lastRow && lastRow.scrollIntoViewIfNeeded();
+    isLoading = false;
+  } else {
+    // 已经全部加载完成，不做处理
+    console.log('pagination2');
+  }
+}
 
 const onRowClick = (row) => {
   console.log('[onRowClick]', JSON.parse(JSON.stringify(row)));
@@ -105,5 +150,12 @@ defineExpose({
 .progress-wrap ::v-deep(.el-progress__text) {
   width: 60px;
   font-size: 12px;
+}
+.text-ellipsis {
+  overflow: hidden; //超出的文本隐藏
+  text-overflow: ellipsis; //溢出用省略号显示
+  display: -webkit-box;
+  -webkit-line-clamp: 3; // 超出多少行
+  -webkit-box-orient: vertical;
 }
 </style>
