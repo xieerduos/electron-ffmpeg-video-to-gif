@@ -1,5 +1,60 @@
 <template>
-  <el-table
+  <div class="table-wrapper" style="height: calc(100vh - 160px - 40px)">
+    <vxe-table
+      ref="tableRef"
+      height="auto"
+      :row-config="{isHover: true}"
+      :checkbox-config="{checkField: 'selection'}"
+      :data="data">
+      <vxe-column
+        v-for="propertiesItem in propertiesArray"
+        :key="propertiesItem.id"
+        :field="propertiesItem.prop"
+        :title="propertiesItem.label"
+        :type="propertiesItem.type"
+        :width="propertiesItem.width">
+        <template v-if="propertiesItem.prop === 'startTime'" #default="scope">
+          {{ scope.row.startTime ? dayjs(scope.row.startTime).format('YYYY/MM/DD HH:mm:ss') : '' }}
+        </template>
+
+        <template v-if="propertiesItem.prop === 'name'" #default="scope">
+          <span
+            class="file-name"
+            @click="handleShowRowFolder(scope.row.path)"
+            :data-id="scope.row.id"
+            :title="scope.row.path"
+            >{{ scope.row.name }}</span
+          >
+        </template>
+
+        <template v-if="propertiesItem.prop === 'size'" #default="scope">
+          {{ bytes(scope.row.size) }}
+        </template>
+        <template v-if="propertiesItem.prop === 'status'" #default="scope">
+          <el-tag class="disabled-transitions" :type="MAP_STATUS.get(scope.row.status).tag">{{
+            MAP_STATUS.get(scope.row.status).text
+          }}</el-tag>
+        </template>
+        <template v-if="propertiesItem.prop === 'progress'" #default="scope">
+          <div class="progress-wrap">
+            <el-progress :percentage="scope.row.progress" :format="(percentage) => percentage.toFixed(1) + '%'" />
+          </div>
+        </template>
+
+        <template v-if="propertiesItem.prop === 'operations'" #default="scope">
+          <el-button
+            @click="handleResultFolder(scope.row)"
+            :disabled="scope.row.status !== 2"
+            text
+            :title="scope.row.path"
+            ><el-icon><Folder /></el-icon
+          ></el-button>
+        </template>
+      </vxe-column>
+    </vxe-table>
+  </div>
+
+  <!-- <el-table
     ref="tableRef"
     :data="tableData"
     :row-key="(row) => row.id"
@@ -56,7 +111,7 @@
         ></el-button>
       </template>
     </el-table-column>
-  </el-table>
+  </el-table> -->
   <p>
     <el-pagination
       v-model:current-page="currentPage"
@@ -136,7 +191,8 @@ const onRowClick = (row) => {
 };
 
 defineExpose({
-  getTableRef: () => tableRef.value
+  // getTableRef: () => tableRef.value
+  getTableRef: () => ({clearSelection: () => {}})
 });
 </script>
 <style lang="scss" scoped>

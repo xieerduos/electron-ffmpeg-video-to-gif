@@ -48,7 +48,9 @@
     "sortablejs": "^1.15.0",
     "sudo-prompt": "^9.2.1",
     "vue": "^3.2.13",
-    "vue-router": "^4.0.3"
+    "vue-router": "^4.0.3",
+    "vxe-table": "^4.4.1",
+    "xe-utils": "^3.5.11"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",

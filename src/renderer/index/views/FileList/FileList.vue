@@ -13,7 +13,7 @@
       :data="fileList"
       :total="fileList.length"
       @selection-change="handleSelectionChange"></FileTable>
-    <input type="file" ref="fileElem" multiple accept="video/*" @change="handleFiles" style="display: none" />
+    <input type="file" ref="fileElem" multiple accept="video/*,image/*" @change="handleFiles" style="display: none" />
   </div>
 </template>
 
