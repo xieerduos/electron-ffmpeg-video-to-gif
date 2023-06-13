@@ -12,13 +12,14 @@
       ref="multipleTableRef"
       :data="fileList"
       :total="fileList.length"
-      @selection-change="handleSelectionChange"></FileTable>
-    <input type="file" ref="fileElem" multiple accept="video/*,image/*" @change="handleFiles" style="display: none" />
+      @checkbox-all="handleSelectionChange"
+      @checkbox-change="handleSelectionChange"></FileTable>
+    <input type="file" ref="fileElem" multiple accept="video/*" @change="handleFiles" style="display: none" />
   </div>
 </template>
 
 <script setup>
-import {onBeforeUnmount, onMounted, ref} from 'vue';
+import {onBeforeUnmount, onMounted, ref, nextTick} from 'vue';
 import Navbar from '@/renderer/index/components/Navbar/index.vue';
 import getNextId from '@/renderer/index/utils/getNextId.js';
 import {VIDEO_TO_GIF} from '@/renderer/index/utils/constant.js';
@@ -43,9 +44,13 @@ const handleClick = () => {
 
 const handleFiles = (event) => {
   const files = Array.from(event.target.files);
-  handleVideoFiles(files);
-  console.log('hanldeFiles', fileElem.value.value);
-  // fileElem.value.value = [];
+  if (files.length > 0) {
+    handleVideoFiles(files);
+
+    console.log('hanldeFiles', fileElem.value.value);
+    return;
+  }
+  fileElem.value.value = [];
 };
 
 const handleDrop = (event) => {
@@ -53,8 +58,10 @@ const handleDrop = (event) => {
   handleVideoFiles(files);
 };
 
-const handleSelectionChange = (selection) => {
-  multipleSelection.value = selection;
+const handleSelectionChange = (event) => {
+  const records = event.$table.getCheckboxRecords();
+
+  multipleSelection.value = records;
 };
 
 const handleVideoFiles = (files) => {
@@ -76,7 +83,7 @@ const handleVideoFiles = (files) => {
     // console.log(files);
 
     handleSendToMain(values);
-    multipleTableRef.value?.getTableRef()?.clearSelection();
+    clearSelection();
   }
 };
 
@@ -85,7 +92,9 @@ const handleStart = (selection) => {
   const stopped = current.filter((item) => item.status === 3);
 
   handleSendToMain(stopped);
-  multipleTableRef.value?.getTableRef()?.clearSelection();
+  nextTick(() => {
+    clearSelection();
+  });
 };
 
 const handleClear = (selection, isDelete = true) => {
@@ -101,12 +110,19 @@ const handleClear = (selection, isDelete = true) => {
     );
   }
 
-  multipleTableRef.value?.getTableRef()?.clearSelection();
+  clearSelection();
+  console.timeEnd('[handleClear]');
 };
 
 const handleCancel = () => {
-  multipleTableRef.value?.getTableRef()?.clearSelection();
+  clearSelection();
 };
+
+function clearSelection() {
+  console.log('multipleSelection.value', multipleSelection.value);
+  multipleSelection.value = [];
+  multipleTableRef.value?.getTableRef()?.clearCheckboxRow();
+}
 
 onMounted(() => {
   fileStore.setFileList(
@@ -128,11 +144,24 @@ onMounted(() => {
     const hasTask = queueManager.getTask(VIDEO_TO_GIF, taskId);
 
     if (data.name === 'progress' && hasTask) {
-      fileStore.setFileList(
-        fileList.value.map((item) => {
-          return item.id === taskId ? {...item, progress: data.value, status: 1} : item;
-        })
-      );
+      const hitIndex = fileList.value.findIndex((item) => {
+        return item.id === taskId;
+      });
+
+      Object.assign(fileList.value[hitIndex], {progress: data.value, status: 1});
+
+      // nextTick(() => {
+      //   multipleTableRef.value?.getTableRef()?.setCurrentRow();
+      //   multipleTableRef.value?.getTableRef()?.clearCurrentRow();
+      // });
+
+      // console.log('fileList.value[hitIndex]', fileList.value[hitIndex]);
+
+      // fileStore.setFileList(
+      //   fileList.value.map((item) => {
+      //     return item.id === taskId ? {...item, progress: data.value, status: 1} : item;
+      //   })
+      // );
     }
   });
 });

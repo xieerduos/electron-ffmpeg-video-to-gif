@@ -9,7 +9,7 @@ export default function useSortable({tableData, tableRef, calculateIndex}) {
   const propertiesArray = ref([
     {prop: 'selection', type: 'checkbox', label: '', reserveSelection: true, width: '55px', align: 'center'},
     // {prop: 'index', type: 'seq', label: '序号', index: calculateIndex, width: '70px', align: 'center'},
-    {prop: 'startTime', type: '', label: '日期', width: '114px', align: ''},
+    {prop: 'startTime', type: '', label: '日期', width: '150px', align: ''},
     {prop: 'id', type: '', label: '任务ID', width: '100px', align: 'center'},
     {prop: 'name', type: '', label: '文件名称', width: '', align: ''},
     {prop: 'size', type: '', label: '大小', width: '', align: 'center'},

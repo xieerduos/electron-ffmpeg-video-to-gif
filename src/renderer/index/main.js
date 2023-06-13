@@ -8,21 +8,17 @@ import {createPinia} from 'pinia';
 import locale from 'element-plus/lib/locale/lang/zh-cn';
 import VXETable from 'vxe-table';
 import 'vxe-table/lib/style.css';
-
+import './styles/index.scss';
 const pinia = createPinia();
 
 const app = createApp(App);
-
-function useTable(app) {
-  app.use(VXETable);
-}
 
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component);
 }
 app.use(ElementPlus, {locale});
 
-app.use(useTable);
+app.use(VXETable);
 app.use(pinia);
 app.use(router);
 app.mount('#app');

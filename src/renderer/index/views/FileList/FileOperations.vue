@@ -5,7 +5,7 @@
     >
     <template v-if="multipleSelection.length > 0">
       <el-button
-        style="width: 90px"
+        style="min-width: 90px"
         v-show="canAllStart > 0"
         type="primary"
         plain
@@ -14,7 +14,7 @@
         >开始({{ canAllStart }})</el-button
       >
       <el-button
-        style="width: 90px"
+        style="min-width: 90px"
         v-show="canAllStop > 0"
         type="danger"
         plain
@@ -23,7 +23,7 @@
         >停止({{ canAllStop }})</el-button
       >
       <el-button
-        style="width: 90px"
+        style="min-width: 90px"
         type="danger"
         plain
         title="点击将会停止任务和清除记录"
@@ -31,7 +31,7 @@
         >清除({{ multipleSelection.length }})</el-button
       >
       <el-button
-        style="width: 90px"
+        style="min-width: 90px"
         type="default"
         plain
         title="点击将会取消选中"

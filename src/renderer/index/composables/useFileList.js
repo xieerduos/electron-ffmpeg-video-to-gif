@@ -5,21 +5,21 @@ import queueManager from '@/renderer/index/composables/queueManager.js';
 
 export const handleSendToMain = (values) => {
   const fileStore = useFileStore();
-  fileStore.setFileList(
-    fileStore.fileList.map((item) => {
-      return values.includes(item) ? {...item, status: 0} : item;
-    })
-  );
+  fileStore.fileList.forEach((item, index) => {
+    if (values.includes(item)) {
+      Object.assign(fileStore.fileList[index], {status: 0});
+    }
+  });
   for (const current of values) {
     queueManager.enqueue({
       uuid: VIDEO_TO_GIF,
       key: current.id,
       fetch: () => {
-        fileStore.setFileList(
-          fileStore.fileList.map((item) => {
-            return item.id === current.id ? {...item, status: 1, progress: 0} : item;
-          })
-        );
+        const taskId = current.id;
+        const hitIndex = fileStore.fileList.findIndex((task) => {
+          return task.id === taskId;
+        });
+        hitIndex !== -1 && Object.assign(fileStore.fileList[hitIndex], {status: 1, progress: 0});
 
         return window.electronAPI
           .invoke('toMain', {
@@ -29,11 +29,12 @@ export const handleSendToMain = (values) => {
             taskId: current.id
           })
           .then(() => {
-            fileStore.setFileList(
-              fileStore.fileList.map((item) => {
-                return item.id === current.id ? {...item, progress: 100, status: 2} : item;
-              })
-            );
+            const taskId = current.id;
+            const hitIndex = fileStore.fileList.findIndex((task) => {
+              return task.id === taskId;
+            });
+
+            hitIndex !== -1 && Object.assign(fileStore.fileList[hitIndex], {status: 2, progress: 100});
 
             ElMessage({type: 'success', message: '转换成功', grouping: true});
           })
@@ -42,11 +43,11 @@ export const handleSendToMain = (values) => {
             if (error?.message?.includes('such file or directory')) {
               ElMessage({type: 'error', message: current.path + ' 文件不存在', grouping: true});
             }
-            fileStore.setFileList(
-              fileStore.fileList.map((item) => {
-                return item.id === current.id ? {...item, status: 3} : item;
-              })
-            );
+            const taskId = current.id;
+            const hitIndex = fileStore.fileList.findIndex((task) => {
+              return task.id === taskId;
+            });
+            hitIndex !== -1 && Object.assign(fileStore.fileList[hitIndex], {status: 3});
           });
       }
     });
@@ -80,11 +81,12 @@ export const handleStop = (selection) => {
       .then(() => {
         const taskId = item.id;
         console.log(taskId, '停止成功');
-        fileStore.setFileList(
-          fileStore.fileList.map((task) => {
-            return task.id === taskId ? {...task, status: 3} : task;
-          })
-        );
+
+        const hitIndex = fileStore.fileList.findIndex((task) => {
+          return task.id === taskId;
+        });
+
+        hitIndex !== -1 && Object.assign(fileStore.fileList[hitIndex], {status: 3});
       })
       .catch((error) => {
         console.error(item.id, '停止失败', error);
@@ -95,11 +97,17 @@ export const handleStop = (selection) => {
         ElMessage({type: 'error', message: '停止失败', grouping: true});
 
         if (cancelCode === -1) {
-          fileStore.setFileList(
-            fileStore.fileList.map((task) => {
-              return task.id === taskId ? {...task, status: 3} : task;
-            })
-          );
+          // fileStore.setFileList(
+          //   fileStore.fileList.map((task) => {
+          //     return task.id === taskId ? {...task, status: 3} : task;
+          //   })
+          // );
+
+          const hitIndex = fileStore.fileList.findIndex((task) => {
+            return task.id === taskId;
+          });
+
+          hitIndex !== -1 && Object.assign(fileStore.fileList[hitIndex], {status: 3});
         }
       });
   }
@@ -115,9 +123,9 @@ export const handleStop = (selection) => {
   }
 
   // 把“排队中”的状态修改为“已停止”
-  fileStore.setFileList(
-    fileStore.fileList.map((task) => {
-      return notStartedIds.includes(task.id) ? {...task, status: 3} : task;
-    })
-  );
+  fileStore.fileList.forEach((task) => {
+    if (notStartedIds.includes(task.id)) {
+      Object.assign(task, {status: 3});
+    }
+  });
 };

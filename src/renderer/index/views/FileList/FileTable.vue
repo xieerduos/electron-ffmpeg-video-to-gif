@@ -2,10 +2,15 @@
   <div class="table-wrapper" style="height: calc(100vh - 160px - 40px)">
     <vxe-table
       ref="tableRef"
+      :data="data"
       height="auto"
-      :row-config="{isHover: true}"
+      border="none"
+      empty-text="暂无数据"
+      :show-overflow="false"
+      :row-config="{isHover: true, keyField: 'id'}"
       :checkbox-config="{checkField: 'selection'}"
-      :data="data">
+      v-bind="$attrs"
+      v-on="$attrs">
       <vxe-column
         v-for="propertiesItem in propertiesArray"
         :key="propertiesItem.id"
@@ -31,13 +36,19 @@
           {{ bytes(scope.row.size) }}
         </template>
         <template v-if="propertiesItem.prop === 'status'" #default="scope">
-          <el-tag class="disabled-transitions" :type="MAP_STATUS.get(scope.row.status).tag">{{
+          {{ MAP_STATUS.get(scope.row.status).text }}
+          <!-- <el-tag class="disabled-transitions" :type="MAP_STATUS.get(scope.row.status).tag">{{
             MAP_STATUS.get(scope.row.status).text
-          }}</el-tag>
+          }}</el-tag> -->
         </template>
         <template v-if="propertiesItem.prop === 'progress'" #default="scope">
           <div class="progress-wrap">
-            <el-progress :percentage="scope.row.progress" :format="(percentage) => percentage.toFixed(1) + '%'" />
+            {{ (scope.row.progress || 0).toFixed(1) }}%
+            <!-- <el-progress
+              :key="scope.row.id"
+              class="disabled-transitions"
+              :percentage="scope.row.progress"
+              :format="(percentage) => percentage.toFixed(1) + '%'" /> -->
           </div>
         </template>
 
@@ -54,75 +65,7 @@
     </vxe-table>
   </div>
 
-  <!-- <el-table
-    ref="tableRef"
-    :data="tableData"
-    :row-key="(row) => row.id"
-    @row-contextmenu="onRowClick"
-    v-bind="$attrs"
-    v-on="$attrs"
-    height="calc(100vh - 160px - 40px)"
-    style="width: 100%">
-    <el-table-column
-      v-for="propertiesItem in propertiesArray"
-      :reserve-selection="propertiesItem.reserveSelection"
-      :index="propertiesItem.index"
-      :key="propertiesItem.prop"
-      :prop="propertiesItem.prop"
-      :label="propertiesItem.label"
-      :type="propertiesItem.type"
-      :width="propertiesItem.width"
-      :align="propertiesItem.align">
-      <template v-if="propertiesItem.prop === 'startTime'" #default="scope">
-        {{ scope.row.startTime ? dayjs(scope.row.startTime).format('YYYY/MM/DD HH:mm:ss') : '' }}
-      </template>
-
-      <template v-if="propertiesItem.prop === 'name'" #default="scope">
-        <span
-          class="file-name text-ellipsis"
-          @click="handleShowRowFolder(scope.row.path)"
-          :data-id="scope.row.id"
-          :title="scope.row.path"
-          >{{ scope.row.name }}</span
-        >
-      </template>
-
-      <template v-if="propertiesItem.prop === 'size'" #default="scope">
-        {{ bytes(scope.row.size) }}
-      </template>
-      <template v-if="propertiesItem.prop === 'status'" #default="scope">
-        <el-tag class="disabled-transitions" :type="MAP_STATUS.get(scope.row.status).tag">{{
-          MAP_STATUS.get(scope.row.status).text
-        }}</el-tag>
-      </template>
-      <template v-if="propertiesItem.prop === 'progress'" #default="scope">
-        <div class="progress-wrap">
-          <el-progress :percentage="scope.row.progress" :format="(percentage) => percentage.toFixed(1) + '%'" />
-        </div>
-      </template>
-
-      <template v-if="propertiesItem.prop === 'operations'" #default="scope">
-        <el-button
-          @click="handleResultFolder(scope.row)"
-          :disabled="scope.row.status !== 2"
-          text
-          :title="scope.row.path"
-          ><el-icon><Folder /></el-icon
-        ></el-button>
-      </template>
-    </el-table-column>
-  </el-table> -->
-  <p>
-    <el-pagination
-      v-model:current-page="currentPage"
-      v-model:page-size="pageSize"
-      :page-sizes="[5, 10, 20, 30]"
-      :total="total"
-      background
-      layout="total, sizes, prev, pager, next, jumper"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange" />
-  </p>
+  <p class="total-text">共 {{ total }} 条数据</p>
 </template>
 <script setup>
 import {ref, nextTick} from 'vue';
@@ -191,8 +134,7 @@ const onRowClick = (row) => {
 };
 
 defineExpose({
-  // getTableRef: () => tableRef.value
-  getTableRef: () => ({clearSelection: () => {}})
+  getTableRef: () => tableRef.value
 });
 </script>
 <style lang="scss" scoped>
@@ -213,5 +155,53 @@ defineExpose({
   display: -webkit-box;
   -webkit-line-clamp: 3; // 超出多少行
   -webkit-box-orient: vertical;
+}
+</style>
+<style lang="scss">
+// 修改滚动条轨道的样式
+.vxe-table--body-wrapper::-webkit-scrollbar-track {
+  background-color: #fff;
+}
+// 修改滚动条的样式
+.vxe-table--body-wrapper::-webkit-scrollbar {
+  width: 6px;
+  background-color: #d7d7d7;
+}
+// 修改滚动条的滑块样式
+.vxe-table--body-wrapper::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 3px;
+}
+.vxe-table:hover .vxe-table--body-wrapper::-webkit-scrollbar-thumb {
+  background-color: #dcdddf;
+}
+
+// 修改滚动条的滑块在 hover 状态下的样式
+.vxe-table .vxe-table--body-wrapper::-webkit-scrollbar-thumb:hover {
+  background-color: #c8c9cc;
+}
+
+.vxe-cell--checkbox .vxe-checkbox--icon {
+  font-size: 16px !important;
+  font-weight: normal !important;
+  color: #dcdfe6 !important;
+}
+.vxe-cell--checkbox .vxe-checkbox--icon:not(.vxe-icon-checkbox-unchecked) {
+  color: var(--color-primary) !important;
+}
+.vxe-table .vxe-table--header-wrapper .vxe-cell {
+  font-weight: normal;
+  color: var(--color-text-bold);
+  font-family: var(--el-font-family);
+  font-size: 14px !important;
+}
+
+.vxe-header--column {
+  padding: 10px 0 !important;
+}
+
+.total-text {
+  color: var(--el-text-color-regular);
+  font-size: 14px;
 }
 </style>
