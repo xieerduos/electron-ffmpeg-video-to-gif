@@ -1,11 +1,14 @@
 <template>
   <div class="titlebar-wrap region-drag">
     <ul v-if="isWindows" class="titlebar-list">
-      <li class="titlebar-item not-drag auto-left" @click="minimizeWindow"><IconMinimize /></li>
-      <li class="titlebar-item not-drag" @click="toggleMaximize">
+      <li class="titlebar-item not-drag auto-left" @click="minimizeWindow" title="最小化"><IconMinimize /></li>
+      <li
+        class="titlebar-item not-drag"
+        @click="toggleMaximize"
+        :title="!isMaximized && !isFullScreen ? '最大化' : '向下还原'">
         <IconMaximize v-if="!isMaximized && !isFullScreen" /> <IconRestore v-else />
       </li>
-      <li class="titlebar-item is-close not-drag" :class="{'not-hover': isNotHover}" @click="closeWindow">
+      <li class="titlebar-item is-close not-drag" :class="{'not-hover': isNotHover}" @click="closeWindow" title="关闭">
         <IconClose />
       </li>
     </ul>
