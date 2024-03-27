@@ -61,7 +61,7 @@ https://www.figma.com/file/K6Kx0px4lLFVp5qhPwxXyG/electron-ffmpeg-video-to-gif?t
 ### 安装项目依赖
 
 ```
-npm install
+npm install --force
 ```
 
 安装过程中遇到问题？

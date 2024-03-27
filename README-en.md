@@ -59,7 +59,7 @@ While working on an open-source project on GitHub, I wanted to incorporate GIFs 
 ### Install Project Dependencies
 
 ```bash
-npm install
+npm install --force
 ```
 
 ### Issues during installation?
